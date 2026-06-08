@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FunASR Live — Real-time Speech Recognition</title>
+<meta name="description" content="Open-source real-time speech-to-text. One Python file. All local. SRT export, WAV recording, AI summarization, 20 themes, 20+ languages.">
+<meta property="og:image" content="social-preview.png">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --card: #111118;
+  --border: #1e1e2e;
+  --text: #cdd6f4;
+  --muted: #6c7086;
+  --accent: #89b4fa;
+  --green: #a6e3a1;
+  --red: #f38ba8;
+  --yellow: #f9e2af;
+  --purple: #cba6f7;
+}
+* { margin:0; padding:0; box-sizing:border-box }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  line-height: 1.6;
+}
+.container { max-width:1040px; margin:0 auto; padding:0 20px }
+nav {
+  position: fixed; top:0; left:0; right:0; z-index:100;
+  backdrop-filter: blur(12px); background: rgba(10,10,15,0.85);
+  border-bottom: 1px solid var(--border);
+}
+nav .container {
+  display:flex; justify-content:space-between; align-items:center;
+  height: 56px;
+}
+nav .logo { font-weight:700; font-size:18px; color: var(--accent) }
+nav .links { display:flex; gap:24px }
+nav .links a { color: var(--muted); text-decoration:none; font-size:14px; transition: color .2s }
+nav .links a:hover { color: var(--text) }
+.hero {
+  padding: 140px 0 80px; text-align:center;
+}
+.hero h1 {
+  font-size: 56px; font-weight:800; letter-spacing: -1px;
+  background: linear-gradient(135deg, #89b4fa, #cba6f7, #f38ba8);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 16px;
+}
+.hero .subtitle { font-size:20px; color: var(--muted); margin-bottom: 32px }
+.badges { display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin-bottom:40px }
+.badge {
+  padding: 5px 12px; border-radius: 20px; font-size:12px; font-weight:600;
+  background: var(--card); border: 1px solid var(--border);
+}
+.cta { margin-bottom:48px }
+.cta a {
+  display:inline-block; padding: 12px 32px; border-radius: 8px;
+  font-weight:600; text-decoration:none; margin:0 6px; font-size:15px;
+}
+.cta .primary { background: var(--accent); color: #11111b }
+.cta .secondary { background: var(--card); color: var(--text); border: 1px solid var(--border) }
+.cta .primary:hover { opacity:0.9 }
+.screenshot {
+  border-radius: 12px; border: 1px solid var(--border);
+  box-shadow: 0 0 60px rgba(137,180,250,0.08);
+  max-width: 100%; height: auto;
+}
+.section { padding: 80px 0 }
+.section h2 {
+  font-size: 32px; font-weight:700; text-align:center; margin-bottom: 12px;
+}
+.section .desc { text-align:center; color: var(--muted); margin-bottom: 48px; font-size:16px }
+.grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:20px }
+.grid-2 { display:grid; grid-template-columns:repeat(2,1fr); gap:20px }
+.card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 28px; transition: border-color .2s;
+}
+.card:hover { border-color: var(--accent) }
+.card .icon { font-size: 28px; margin-bottom: 12px }
+.card h3 { font-size: 17px; margin-bottom: 8px; color: var(--text) }
+.card p { font-size: 14px; color: var(--muted); line-height: 1.55 }
+table {
+  width:100%; border-collapse:collapse; font-size:14px;
+}
+th, td {
+  padding: 12px 16px; text-align:left; border-bottom: 1px solid var(--border);
+}
+th { color: var(--muted); font-weight:600; font-size:13px; text-transform:uppercase; letter-spacing:0.5px }
+td:first-child { font-weight:600; color: var(--text); min-width:160px }
+td .yes { color: var(--green) }
+td .no { color: var(--red) }
+td .us { color: var(--accent); font-weight:700 }
+.code-block {
+  background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 20px; overflow-x:auto; margin-top: 32px;
+}
+.code-block code { font-family: 'SF Mono', 'Fira Code', monospace; font-size:13px; color: var(--green); line-height:1.7 }
+.stats { display:flex; justify-content:center; gap:48px; margin-top:40px }
+.stat { text-align:center }
+.stat .num { font-size:36px; font-weight:800; color: var(--accent) }
+.stat .label { font-size:13px; color: var(--muted); margin-top:4px }
+.arch {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 32px; overflow-x:auto; margin-top:24px;
+}
+.arch pre { font-family: 'SF Mono', monospace; font-size:12px; line-height:1.9; color: var(--text); white-space:pre }
+.arch .hl { color: var(--accent) }
+.arch .g { color: var(--green) }
+.arch .p { color: var(--purple) }
+.arch .y { color: var(--yellow) }
+footer {
+  text-align:center; padding: 40px 0; border-top: 1px solid var(--border);
+  color: var(--muted); font-size:14px;
+}
+footer a { color: var(--accent); text-decoration:none }
+@media (max-width:768px) {
+  .hero h1 { font-size:36px }
+  .grid-3,.grid-2 { grid-template-columns:1fr }
+  .stats { flex-wrap:wrap; gap:24px }
+  nav .links { display:none }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <div class="logo">🎙️ FunASR Live</div>
+    <div class="links">
+      <a href="#features">Features</a>
+      <a href="#compare">Compare</a>
+      <a href="#quickstart">Quickstart</a>
+      <a href="https://github.com/KevPH2026/funasr-live">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container">
+    <h1>Real-Time Speech Recognition<br>That Just Works</h1>
+    <p class="subtitle">One Python file. Zero cloud. Everything included.</p>
+    <div class="badges">
+      <span class="badge">🐍 Python 3.10+</span>
+      <span class="badge">🔒 100% Local</span>
+      <span class="badge">🌍 20+ Languages</span>
+      <span class="badge">📦 3 Dependencies</span>
+      <span class="badge">🎨 20 Themes</span>
+      <span class="badge">🆓 MIT License</span>
+    </div>
+    <div class="cta">
+      <a href="https://github.com/KevPH2026/funasr-live" class="primary">⭐ Star on GitHub</a>
+      <a href="#quickstart" class="secondary">🚀 Quick Start</a>
+    </div>
+    <img class="screenshot" src="screenshot.png" alt="FunASR Live UI">
+  </div>
+</section>
+
+<section class="section" id="features">
+  <div class="container">
+    <h2>Everything You Need</h2>
+    <p class="desc">We took Alibaba's FunASR engine and turned it into a complete product.</p>
+    <div class="grid-3">
+      <div class="card">
+        <div class="icon">⚡</div>
+        <h3>SSE Real-Time Push</h3>
+        <p>No polling. No refresh. Text streams to your browser via Server-Sent Events with &lt;100ms latency.</p>
+      </div>
+      <div class="card">
+        <div class="icon">📥</div>
+        <h3>SRT Subtitle Export</h3>
+        <p>One click downloads standard .srt with timestamps. Drag directly into Premiere or DaVinci Resolve.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🎙️</div>
+        <h3>WAV Audio Recording</h3>
+        <p>Toggle to save mic audio as .wav on your desktop. Auto-fixes file headers on stop.</p>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:24px">
+      <div class="card" style="padding:12px">
+        <img src="screenshot-srt.png" style="width:100%;border-radius:8px" alt="SRT subtitle export feature">
+        <p style="text-align:center;margin-top:8px;font-size:13px;color:var(--muted)">📥 SRT Subtitle Export — One click, timestamps included</p>
+      </div>
+      <div class="card" style="padding:12px">
+        <img src="screenshot-history.png" style="width:100%;border-radius:8px" alt="History tab with transcription">
+        <p style="text-align:center;margin-top:8px;font-size:13px;color:var(--muted)">📜 History Tab — Full transcription with speaker labels</p>
+      </div>
+    </div>
+
+    <div class="grid-3" style="margin-top:32px">
+        <div class="icon">🧠</div>
+        <h3>AI Summarization</h3>
+        <p>Ollama integration generates mindmaps, key points, and quote highlights from your speech.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🌍</div>
+        <h3>Real-Time Translation</h3>
+        <p>Detect 20+ languages → translate to 20+ targets. Google Translate-based, zero config.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🎨</div>
+        <h3>20 Curated Themes</h3>
+        <p>Not just dark mode. Cyber green, neon night, midnight ink, warm paper, polar frost — 20 handcrafted themes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background:var(--card);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container">
+    <h2>By the Numbers</h2>
+    <div class="stats">
+      <div class="stat"><div class="num">&lt;100ms</div><div class="label">Recognition Latency</div></div>
+      <div class="stat"><div class="num">49KB</div><div class="label">Single File Size</div></div>
+      <div class="stat"><div class="num">20+</div><div class="label">Languages Supported</div></div>
+      <div class="stat"><div class="num">3</div><div class="label">pip Dependencies</div></div>
+      <div class="stat"><div class="num">9</div><div class="label">README Languages</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="compare">
+  <div class="container">
+    <h2>Why Not Cloud APIs or Desktop Apps?</h2>
+    <p class="desc">We sit in the sweet spot: pro features + local privacy + hackable code.</p>
+    <table>
+      <thead>
+        <tr><th></th><th>Cloud APIs</th><th>Desktop Apps</th><th>FunASR Live</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Privacy</td><td class="no">❌ Audio to cloud</td><td class="yes">✅ Local</td><td class="us">✅ 100% Local, Zero Network</td></tr>
+        <tr><td>Cost</td><td class="no">❌ Per-minute billing</td><td>💰 One-time</td><td class="us">🆓 Free Forever</td></tr>
+        <tr><td>Latency</td><td>⚠️ 1-3s</td><td class="yes">✅ Real-time</td><td class="us">✅ SSE &lt;100ms</td></tr>
+        <tr><td>Languages</td><td class="yes">✅ 50+</td><td>⚠️ Limited</td><td class="us">✅ Auto-Detect 20+</td></tr>
+        <tr><td>Subtitle Export</td><td class="no">❌ Extra tool</td><td>⚠️ Locked format</td><td class="us">✅ 1-Click SRT</td></tr>
+        <tr><td>Audio Recording</td><td class="no">❌ No</td><td class="yes">✅ Yes</td><td class="us">✅ Toggle WAV Save</td></tr>
+        <tr><td>AI Summary</td><td class="no">❌ Extra API cost</td><td class="no">❌ Rare</td><td class="us">✅ Built-in (Ollama)</td></tr>
+        <tr><td>Customization</td><td class="no">❌ Closed</td><td class="no">❌ Closed</td><td class="us">✅ Full Source, 20 Themes</td></tr>
+        <tr><td>Deployment</td><td>N/A</td><td>Installer</td><td class="us">🚀 Single .py File</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2>Architecture</h2>
+    <p class="desc">What we built on top of the original FunASR engine.</p>
+    <div class="arch">
+<pre>
+<span class="hl">🎤 Microphone</span>                                               
+  │  <span class="g">ffmpeg (1.5s chunks)</span>
+  ▼
+<span class="hl">🔇 VAD Filter</span> (fsmn-vad)
+  │
+  ▼
+<span class="hl">🧠 SenseVoiceSmall</span> (ASR Engine)
+  │
+  ├──→ <span class="p">📝 Punctuation Model</span> (punc_ct-transformer)
+  ├──→ <span class="y">🌍 Google Translate</span> (20+ languages)
+  └──→ <span class="g">🤖 Ollama</span> (AI mindmap/summary/quotes)
+  │
+  ▼
+<span class="hl">⚡ SSE Stream</span> → Browser (Real-time &lt;100ms)
+  │
+  ├──→ <span class="p">📥 SRT Export</span> (subtitles with timestamps)
+  ├──→ <span class="y">🎙️ WAV Recording</span> (save to desktop)
+  └──→ <span class="g">🎨 20 Themes</span> (CSS variable system)
+</pre>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="quickstart" style="background:var(--card);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container">
+    <h2>Quick Start</h2>
+    <p class="desc">Three commands. That's it.</p>
+    <div class="code-block">
+      <code>
+# 1. Install dependencies<br>
+pip install funasr deep-translator numpy<br><br>
+# 2. (Optional) Install Ollama for AI summarization<br>
+brew install ollama && ollama pull qwen2.5:14b<br><br>
+# 3. Run<br>
+python3 funasr_live.py<br><br>
+# 4. Open<br>
+open http://localhost:8765
+      </code>
+    </div>
+    <div style="text-align:center;margin-top:32px">
+      <a href="https://github.com/KevPH2026/funasr-live" class="cta primary" style="display:inline-block;padding:14px 36px;border-radius:8px;font-weight:600;text-decoration:none;background:var(--accent);color:#11111b;font-size:16px">
+        🚀 Get Started on GitHub
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2>Use Cases</h2>
+    <p class="desc">One tool, many workflows.</p>
+    <div class="grid-2">
+      <div class="card"><div class="icon">📋</div><h3>Meeting Notes</h3><p>Record + AI summary + SRT export as meeting minutes. Never take notes manually again.</p></div>
+      <div class="card"><div class="icon">🎬</div><h3>Content Creation</h3><p>Dictate scripts and get instant text. Generate SRT subtitles for video editing.</p></div>
+      <div class="card"><div class="icon">🌐</div><h3>Language Learning</h3><p>Speak in one language, see translation in another. Real-time feedback loop.</p></div>
+      <div class="card"><div class="icon">♿</div><h3>Accessibility</h3><p>Live captions for presentations or calls. No cloud dependency = privacy-safe.</p></div>
+      <div class="card"><div class="icon">🎤</div><h3>Research Interviews</h3><p>Record WAV + get timestamped transcripts. Searchable, exportable.</p></div>
+      <div class="card"><div class="icon">🔒</div><h3>Privacy-Sensitive</h3><p>Medical, legal, or confidential settings where cloud APIs are not allowed.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background:var(--card);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container">
+    <h2>Keyboard Shortcuts</h2>
+    <p class="desc">Full control without touching the mouse.</p>
+    <table style="max-width:460px;margin:0 auto">
+      <thead><tr><th>Key</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr><td><code>Space</code></td><td>Pause / Resume</td></tr>
+        <tr><td><code>S</code></td><td>Download SRT Subtitles</td></tr>
+        <tr><td><code>R</code></td><td>Toggle Recording</td></tr>
+        <tr><td><code>1</code></td><td>Switch to History Tab</td></tr>
+        <tr><td><code>2</code></td><td>Switch to Mindmap Tab</td></tr>
+        <tr><td><code>3</code></td><td>Switch to Key Points Tab</td></tr>
+        <tr><td><code>4</code></td><td>Switch to Quotes Tab</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>Built with ❤️ by <a href="https://superk.ai">Mr.K Lab</a> · Based on <a href="https://github.com/modelscope/FunASR">FunASR</a> · MIT License</p>
+    <p style="margin-top:8px">
+      Readme in:
+      <a href="README.md">English</a> ·
+      <a href="README_zh.md">中文</a> ·
+      <a href="README_ja.md">日本語</a> ·
+      <a href="README_ko.md">한국어</a> ·
+      <a href="README_es.md">Español</a> ·
+      <a href="README_fr.md">Français</a> ·
+      <a href="README_de.md">Deutsch</a> ·
+      <a href="README_pt.md">Português</a> ·
+      <a href="README_ru.md">Русский</a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
